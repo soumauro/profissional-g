@@ -33,22 +33,13 @@
           </v-card-item>
 
           <v-card-actions>
-            <v-btn
-              color="primary"
-              variant="outlined"
-              :disabled="!exame.available"
-              @click="openDialog(exame)"
-            >
+            <v-btn color="primary" variant="outlined" :disabled="!exame.available" @click="openDialog(exame)">
               <v-icon left>mdi-information</v-icon>
               Detalhes
             </v-btn>
-            <v-btn
-            :to="{name:'exameuser', params:{uuid:exame.uuid}}" 
-            color="secondary"
-              variant="flat"
-              :disabled="!exame.available"
-             
-            >
+            <v-btn color="secondary" variant="flat" :disabled="!exame.available" @click="
+              exame.id < 3 ? openexame(exame.uuid) :
+                opendialog2(exame.uuid)">
               <v-icon left>mdi-calendar</v-icon>
               Fazer Exame
             </v-btn>
@@ -76,6 +67,35 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialog2" max-width="500">
+           <v-card>
+        <v-card-title class="headline">
+          Pagamento para Realização do Exame
+        </v-card-title>
+
+        <v-card-text>
+          <p>
+            Para realizar o exame, insira seu número de telefone da Vodacom.
+            Será cobrado um valor de <strong>25 MTN</strong>.
+          </p>
+
+          <v-text-field v-model="phoneNumber" label="Número de Telefone" placeholder="84XXXXXXX" outlined
+            :rules="phoneRules" required></v-text-field>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-1" @click="dialog2 = false">
+            Cancelar
+          </v-btn>
+          <v-btn :loading="loading" variant="tonal" class="text-none" color="green darken-1" @click="confirmPage()">
+            Realizar Pagamento
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </v-container>
 </template>
 
@@ -93,8 +113,16 @@ export default defineComponent({
 
   data() {
     return {
+      examUuid: "",
       exameList: [] as { id: number; available: number; uuid: string }[],
       dialog: false, // Controla a visibilidade do dialog
+      dialog2: false, // Controla a visibilidade do dialog
+      phoneNumber: "",
+      loading: false,
+      phoneRules: [
+        (v: string) => !!v || "Número de telefone é obrigatório",
+        (v: string) => /^84[0-9]{7}$/.test(v) || "Número de telefone inválido",
+      ],
       selectedExame: null as { id: number; available: number; uuid: string } | null, // Exame selecionado para detalhes
     };
   },
@@ -102,6 +130,28 @@ export default defineComponent({
     this.getallExames();
   },
   methods: {
+    openexame(uuid2: string) {
+      this.examUuid = uuid2;
+      this.$router.push({ name: 'exameuser', params: { uuid: this.examUuid } })
+    },
+    async confirmPage() {
+      this.loading = true;
+      const response = await apiService.insert(`${baseurl}/pay`, {
+        "phoneNumber": `258${this.phoneNumber}`,
+        "amount": "25"
+      }).then((val) => {
+        this.$router.push({ name: 'exameuser', params: { uuid: this.examUuid } })
+
+      }).catch(() => {
+        alert("Erro ao efetuar o pagamento");
+      }).finally(() => { this.loading = false });
+
+    },
+    opendialog2(uuids: string) {
+      this.examUuid = uuids;
+      this.dialog2 = !this.dialog2;
+
+    },
     async getallExames() {
       try {
         const response = await apiService.get(`${baseurl}/`);
@@ -126,9 +176,11 @@ export default defineComponent({
 .v-card {
   transition: transform 0.2s;
 }
+
 .v-card:hover {
   transform: translateY(-5px);
 }
+
 .v-chip {
   margin-right: 8px;
 }

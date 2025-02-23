@@ -3,8 +3,8 @@
     <!-- Título do Quiz -->
     <v-row class="mb-4">
       <v-col cols="12">
-        <h1 class="text-h4 font-weight-bold">Quiz</h1>
-        <p class="text-subtitle-1">Teste seus conhecimentos!</p>
+        <h1 class="text-h4 font-weight-bold">Carta Moz </h1>
+        <p class="text-subtitle-1">Exame Profissional-G 2025</p>
       </v-col>
     </v-row>
 
