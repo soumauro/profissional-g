@@ -5,12 +5,18 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/about',
     name: 'about',
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import(/* webpackChunkName: "about" */ '../views/login.vue')
   },
   {
     path: '/landpage',
@@ -27,7 +33,8 @@ const routes: Array<RouteRecordRaw> = [
     path: '/exame/:uuid',
     name: 'exameuser',
     component: () => import(/* webpackChunkName: "about" */ '../views/makeexame.vue'),
-    props:true
+    props:true,
+    meta: { requiresAuth: true }
   },
   {
     path: '/examesadmin',

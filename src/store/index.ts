@@ -2,13 +2,23 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-  },
-  getters: {
+    userUid: null,
+    isloged: false
   },
   mutations: {
+    setUserUid(state, {userUid: uid, isloged: isloged }) {
+      state.userUid = uid;
+      state.isloged = isloged;
+    }
   },
   actions: {
+    fetchUserUid({ commit }, {userUid: userUid, isloged:isloged }) {
+      commit('setUserUid', { userUid, isloged });
+    }
   },
-  modules: {
+  getters: {
+    getUserUid: (state) => {
+      return { userUid: state.userUid, isloged: state.isloged };
+    }
   }
 })

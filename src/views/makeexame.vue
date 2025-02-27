@@ -31,7 +31,14 @@
     <!-- Pergunta Atual -->
     <v-row v-if="currentQuestion">
       <v-col cols="12">
-        <v-card class="pa-4">
+        <v-btn @click="showAnswer =!showAnswer" :prepend-icon="showAnswer ? 'mdi-eye': 'mdi-eye-off'" class="text-none ma-1"> Resposta </v-btn>
+        <v-chip color="green" v-show="showAnswer">
+          {{ currentQuestion.answer }}
+
+        </v-chip>
+      </v-col>
+      <v-col cols="12">
+        <v-card class="pa-2" elevation="4">
           <h3>{{ currentQuestion.question }}</h3>
           <v-card-text>
             <v-radio-group v-model="selectedAnswer">
@@ -166,6 +173,7 @@ export default defineComponent({
       questionsList: [] as Question[],
       currentQuestionIndex: 0,
       selectedAnswer: '',
+      showAnswer:false,
       score: 0,
       elapsedTime: 0,
       timer: null as number | null,
@@ -192,6 +200,7 @@ export default defineComponent({
     this.getallExames();
   },
   methods: {
+
     async getallExames() {
       try {
         const response = await apiService.get(`${baseurl}/user/${this.$route.params.uuid}`);

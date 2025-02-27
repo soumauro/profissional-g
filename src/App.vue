@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="app">
     <v-main>
       <router-view/>
     </v-main>
@@ -18,4 +18,10 @@ export default defineComponent({
     }
   },
 })
+
 </script>
+<style >
+.app{
+ background-color: rgb(252, 246, 246);
+}
+</style>
