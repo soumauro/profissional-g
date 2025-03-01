@@ -103,15 +103,19 @@
                 'incorrect-answer': !result.correct,
               }"
             >
-              <v-list-item-title>
-                Pergunta {{ index + 1 }}: {{ result.correct ? 'Correta' : 'Incorreta' }}
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                Resposta escolhida: {{ result.selected }}
-              </v-list-item-subtitle>
-              <v-list-item-subtitle>
-                Resposta correta: {{ result.correctAnswer }}
-              </v-list-item-subtitle>
+              <p>
+                {{ index + 1 }}: {{ result.correct ? 'Correta' : 'Incorreta' }}
+
+              </p>
+              
+              <p>
+
+                R escolhida: {{ result.selected }}
+              </p>
+              <p>
+
+                R correta: {{ result.correctAnswer }}
+              </p>
             </v-list-item>
           </v-list>
         </v-card-text>
@@ -143,7 +147,8 @@
 import { defineComponent } from 'vue';
 import ApiService from '@/db/apiservice';
 import routersName from '@/db/apiname';
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const apiService = new ApiService();
 const routersNames = new routersName();
 const baseurl = routersNames.user;
@@ -200,6 +205,9 @@ export default defineComponent({
     this.getallExames();
   },
   methods: {
+    mane(){
+      this.$router.push({"name":"home"})
+    },
 
     async getallExames() {
       try {

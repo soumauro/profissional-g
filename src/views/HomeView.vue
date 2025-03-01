@@ -102,6 +102,7 @@
     <v-btn class="my-2 text-none" color="primary" @click="dialog3 = true">
       Escolher Plano premium
     </v-btn>
+    <v-btn class="text-none pa-2" color="green" @click="getUserProfile()"> Atualizar Conta</v-btn>
     <br>
     <v-row class="mb-4">
       <v-col cols="12">
@@ -116,8 +117,8 @@
 
     </v-tabs>
 
-    <!-- Botão de ação -->
-    <!-- <v-row class="mb-6">
+<!-- 
+     <v-row class="mb-6">
       <v-col cols="12">
         <v-btn :to="{ name: 'exames' }" color="primary" prepend-icon="mdi-plus">
           Agendar Novo Exame
@@ -459,6 +460,10 @@ export default defineComponent({
     },
     async loadMoreQuestions(last: number) {
       try {
+        if (this.userProfile.ativo == 0) {
+          alert("Disponivel somente para usuarios premiuns")
+        return
+        }
         this.questionsList = [];
         const response = await apiService.get(`${baseurl}/user2/${last}`);
         this.questionsList = response as { id: number, correctAnswer: string, question: string }[];
