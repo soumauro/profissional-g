@@ -111,8 +111,9 @@
       </v-col>
     </v-row>
     <v-tabs v-model="tab" color="deep-purple-accent-4">
-      <v-tab :value="1">Exames</v-tab>
-      <v-tab :value="2" @click="getallSumary()">Resumo</v-tab>
+      <v-chip>Exames:</v-chip>
+      <v-tab :value="1">Atuais</v-tab>
+      <v-tab :value="2" >Antigos</v-tab>
 
 
     </v-tabs>
@@ -120,11 +121,15 @@
 <!-- 
      <v-row class="mb-6">
       <v-col cols="12">
+
         <v-btn :to="{ name: 'exames' }" color="primary" prepend-icon="mdi-plus">
           Agendar Novo Exame
         </v-btn>
+        <v-btn :to="{ name: 'ExamesView_a' }" color="primary" prepend-icon="mdi-plus">
+          Agendar antigos
+        </v-btn>
       </v-col>
-    </v-row> -->
+    </v-row>  -->
 
     <!-- Lista de exames -->
     <v-window v-model="tab">
@@ -155,42 +160,52 @@
                   color="secondary" variant="flat" :disabled="!exame.available">
                   <v-icon left>mdi-calendar</v-icon>
                   {{ userProfile.ativo == 0 && exame.id > 2 ? "Conteúdo Premium" : "Fazer exame" }} </v-btn>
+                <v-btn
+                  @click="userProfile.ativo == 0 && exame.id > 2 ? openreview(exame.uuid) : openfreeReview(exame.uuid)"
+                  color="secondary" variant="flat" :disabled="!exame.available">
+                  <v-icon left>mdi-calendar</v-icon>
+                  {{ userProfile.ativo == 0 && exame.id > 2 ? "Conteúdo Premium" : "ver resumo" }} </v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
       </v-window-item>
       <v-window-item :value="2">
+        
+
         <v-row>
-          <v-col cols="12" v-for="i in questionsList" :key="i.id">
-            <v-card class="pa-4 mb-4" elevation="3">
-              <!-- Cabeçalho da Pergunta -->
-              <v-chip color="green" class="mr-3">{{ i.id }}</v-chip>
-              <span class="text-h6">{{ i.question }}</span>
+          <v-col cols="12" md="6" v-for="exame in exameList2" :key="exame.id">
+            <v-card class="pa-4" hover>
+              <v-card-item>
+                <v-card-title class="text-h6">
+                  Exame #{{ exame.id }}
+                </v-card-title>
+                <v-card-subtitle>
+                  <v-chip :color="exame.available ? 'green' : 'red'" size="small" class="mr-2">
+                    {{ exame.available ? 'Disponível' : 'Indisponível' }}
+                  </v-chip>
+                </v-card-subtitle>
+              </v-card-item>
 
-
-              <!-- Resposta Correta -->
-              <v-card-text>
-                <v-alert type="success" outlined dense>
-                  R: <strong>{{ i.correctAnswer }}</strong>
-                </v-alert>
-              </v-card-text>
-
-
+              <v-card-actions>
+                <v-btn color="primary" variant="outlined" :disabled="!exame.available" @click="openDialog(exame)">
+                  <v-icon left>mdi-information</v-icon>
+                  Detalhes
+                </v-btn>
+                <v-btn
+                  @click="userProfile.ativo == 0 && exame.id > 2 ? openexame2(exame.uuid) : openfreeExams2(exame.uuid)"
+                  color="secondary" variant="flat" :disabled="!exame.available">
+                  <v-icon left>mdi-calendar</v-icon>
+                  {{ userProfile.ativo == 0 && exame.id > 2 ? "Conteúdo Premium" : "Fazer exame" }} </v-btn>
+                <v-btn
+                  @click="userProfile.ativo == 0 && exame.id > 2 ? openreview2(exame.uuid) : openfreeReview2(exame.uuid)"
+                  color="secondary" variant="flat" :disabled="!exame.available">
+                  <v-icon left>mdi-calendar</v-icon>
+                  {{ userProfile.ativo == 0 && exame.id > 2 ? "Conteúdo Premium" : "ver resumo" }} </v-btn>
+              </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
-        <v-col cols="12" class="text-center">
-          <v-btn class="ma-2" color="primary" @click="dialog10=!dialog10">
-            <v-icon left>mdi-refresh</v-icon>
-           reiniciar
-          </v-btn>
-          
-          <v-btn color="primary" @click="loadMoreQuestions(questionsList[questionsList.length - 1].id)">
-            <v-icon left>mdi-plus</v-icon>
-            Proxima pagina
-          </v-btn>
-        </v-col>
       </v-window-item>
     </v-window>
     <!-- Dialog de detalhes -->
@@ -339,12 +354,12 @@ export default defineComponent({
       dialog10: false,
       plano: {
         tempo: "mensal",
-        montante: 250
+        montante: 168
       } as { tempo: string, montante: number },
-      price: [{ "tempo": "diario", "montante": 25 },
+      price: [
       { "tempo": "semanal", "montante": 100 },
-      { "tempo": "mensal", "montante": 250 },
-      { "tempo": "semestral", "montante": 550 }
+      { "tempo": "mensal", "montante": 210 },
+      { "tempo": "semestral", "montante": 330 }
       ],
       userProfile: {} as {
         id: number,
@@ -362,6 +377,8 @@ export default defineComponent({
       examUuid: "",
       exameList: [] as { id: number; available: number; uuid: string }[],
       questionsList: [] as { id: number, correctAnswer: string, question: string }[],
+      exameList2: [] as { id: number; available: number; uuid: string }[],
+      questionsList2: [] as { id: number, correctAnswer: string, question: string }[],
       dialog: false, // Controla a visibilidade do dialog
       dialog2: false, // Controla a visibilidade do dialog
       phoneNumber: "",
@@ -382,6 +399,7 @@ export default defineComponent({
   mounted() {
     this.getUserProfile()
     this.getallExames();
+    this.getallExamesOlds();
 
   },
   methods: {
@@ -411,6 +429,45 @@ export default defineComponent({
       }
       this.dialog3 = true
     },
+    openfreeExams2(uuid2: string) {
+      this.examUuid = uuid2;
+      this.$router.push({ name: 'exameuser2', params: { uuid: this.examUuid } })
+
+    },
+    openexame2(uuid2: string) {
+      this.examUuid = uuid2;
+      if (this.userProfile.ativo == 1) {
+        this.$router.push({ name: 'exameuser2', params: { uuid: this.examUuid } })
+
+      }
+      this.dialog3 = true
+    },
+    openfreeReview(uuid2: string) {
+      this.examUuid = uuid2;
+      this.$router.push({ name: 'ReviewPage', params: { uuid: this.examUuid } })
+
+    },
+    openreview(uuid2: string) {
+      this.examUuid = uuid2;
+      if (this.userProfile.ativo == 1) {
+        this.$router.push({ name: 'ReviewPage', params: { uuid: this.examUuid } })
+
+      }
+      this.dialog3 = true
+    },
+    openfreeReview2(uuid2: string) {
+      this.examUuid = uuid2;
+      this.$router.push({ name: 'ReviewPage2', params: { uuid: this.examUuid } })
+
+    },
+    openreview2(uuid2: string) {
+      this.examUuid = uuid2;
+      if (this.userProfile.ativo == 1) {
+        this.$router.push({ name: 'ReviewPage2', params: { uuid: this.examUuid } })
+
+      }
+      this.dialog3 = true
+    },
     async confirmPage() {
       this.loading = true;
       const response = await apiService.insert(`${baseurl}/pay`, {
@@ -432,6 +489,14 @@ export default defineComponent({
       try {
         const response = await apiService.get(`${baseurl}/`);
         this.exameList = response as { id: number; available: number; uuid: string }[];
+      } catch (error) {
+        console.error('Erro ao carregar exames:', error);
+      }
+    },
+    async getallExamesOlds() {
+      try {
+        const response = await apiService.get(`${baseurl}/a/`);
+        this.exameList2 = response as { id: number; available: number; uuid: string }[];
       } catch (error) {
         console.error('Erro ao carregar exames:', error);
       }
@@ -458,20 +523,7 @@ export default defineComponent({
       
       
     },
-    async loadMoreQuestions(last: number) {
-      try {
-        if (this.userProfile.ativo == 0) {
-          alert("Disponivel somente para usuarios premiuns")
-        return
-        }
-        this.questionsList = [];
-        const response = await apiService.get(`${baseurl}/user2/${last}`);
-        this.questionsList = response as { id: number, correctAnswer: string, question: string }[];
-        this.restartSumary(last);
-      } catch (error) {
-        console.error('Erro ao carregar exames:', error);
-      }
-    },
+
     openDialog(exame: { id: number; available: number; uuid: string }) {
       this.selectedExame = exame;
       this.dialog = true;

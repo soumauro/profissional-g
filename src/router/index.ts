@@ -30,6 +30,12 @@ const routes: Array<RouteRecordRaw> = [
     props:true
   },
   {
+    path: '/questionsview2/:uuid',
+    name: 'QuestionsView2',
+    component: () => import(/* webpackChunkName: "about" */ '../views/questionviewantigas.vue'),
+    props:true
+  },
+  {
     path: '/exame/:uuid',
     name: 'exameuser',
     component: () => import(/* webpackChunkName: "about" */ '../views/makeexame.vue'),
@@ -37,9 +43,35 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/exames2/:uuid',
+    name: 'exameuser2',
+    component: () => import(/* webpackChunkName: "about" */ '../views/makeexame2.vue'),
+    props:true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/review/:uuid',
+    name: "ReviewPage",
+    component: () => import(/* webpackChunkName: "about" */ '../views/makereview.vue'),
+    props:true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/reviewew/:uuid',
+    name: "ReviewPage2",
+    component: () => import(/* webpackChunkName: "about" */ '../views/makereview2.vue'),
+    props:true,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/examesadmin',
     name: 'exames',
     component: () => import( '../views/exames.vue')
+  },
+  {
+    path: '/examesadmin2',
+    name: "ExamesView_a",
+    component: () => import( '../views/exames_a.vue')
   },
 ]
 
