@@ -1,6 +1,7 @@
 <template>
   <v-container>
-
+    <h3 class="text-h6 font-weight-bold">Carta Moz Profissional-G </h3>
+    
     <v-expansion-panels>
       <v-expansion-panel>
         <v-expansion-panel-title>
@@ -99,40 +100,31 @@
     </v-expansion-panels>
 
     <!-- Título da página -->
-    <v-btn class="my-2 text-none" color="primary" @click="dialog3 = true">
+    <v-btn class="ma-6  text-none " color="primary" @click="dialog3 = true">
       Escolher Plano premium
     </v-btn>
     <v-btn class="text-none pa-2" color="green" @click="getUserProfile()"> Atualizar Conta</v-btn>
+    
+    <!-- <v-btn class="text-none pa-2" color="pink" :to="{name: 'PromocoesPage'}">Promoções</v-btn> -->
+    
     <br>
-    <v-row class="mb-4">
-      <v-col cols="12">
-        <h1 class="text-h4 font-weight-bold">Exames Profissional -G Disponíveis 2025</h1>
-        <p class="text-subtitle-1">Confira a lista de exames que você pode realizar.</p>
-      </v-col>
-    </v-row>
-    <v-tabs v-model="tab" color="deep-purple-accent-4">
-      <v-chip>Exames:</v-chip>
-      <v-tab :value="1">Atuais</v-tab>
-      <v-tab :value="2" >Antigos</v-tab>
+   
+    
 
 
-    </v-tabs>
-
-<!-- 
-     <v-row class="mb-6">
+      <v-row class="mb-6">
       <v-col cols="12">
 
-        <v-btn :to="{ name: 'exames' }" color="primary" prepend-icon="mdi-plus">
+        <!-- <v-btn :to="{ name: 'exames' }" color="primary" prepend-icon="mdi-plus">
           Agendar Novo Exame
-        </v-btn>
-        <v-btn :to="{ name: 'ExamesView_a' }" color="primary" prepend-icon="mdi-plus">
-          Agendar antigos
-        </v-btn>
+        </v-btn> -->
+        
       </v-col>
-    </v-row>  -->
+    </v-row> 
 
     <!-- Lista de exames -->
     <v-window v-model="tab">
+
       <v-window-item :value="1">
 
 
@@ -141,67 +133,28 @@
             <v-card class="pa-4" hover>
               <v-card-item>
                 <v-card-title class="text-h6">
-                  Exame #{{ exame.id }}
+                 {{ exame.novo ? "Exame Atualizado" : "Exame Antigo" }} 
                 </v-card-title>
                 <v-card-subtitle>
-                  <v-chip :color="exame.available ? 'green' : 'red'" size="small" class="mr-2">
-                    {{ exame.available ? 'Disponível' : 'Indisponível' }}
+                  <v-chip :color="userProfile.ativo == 0 && exame.id > 1 ? 'red' : 'green'" size="small" class="mr-2">
+                    {{ userProfile.ativo == 0 && exame.id > 1 ? 'Trancado' : 'Disponivel' }}
                   </v-chip>
                 </v-card-subtitle>
               </v-card-item>
 
               <v-card-actions>
-                <v-btn color="primary" variant="outlined" :disabled="!exame.available" @click="openDialog(exame)">
-                  <v-icon left>mdi-information</v-icon>
-                  Detalhes
-                </v-btn>
+               
                 <v-btn
-                  @click="userProfile.ativo == 0 && exame.id > 2 ? openexame(exame.uuid) : openfreeExams(exame.uuid)"
+                  @click="userProfile.ativo == 0 && exame.id > 1 ? openexame(exame.uuid) : openfreeExams(exame.uuid)"
+                  color="secondary" variant="flat" :disabled="!exame.available" class="text-none" >
+                  <v-icon left>mdi-calendar</v-icon>
+                  {{ userProfile.ativo == 0 && exame.id > 1 ? "Conteúdo Premium" : "Fazer exame" }} </v-btn>
+                <v-btn
+                  class="text-none"
+                  @click="userProfile.ativo == 0 && exame.id > 1 ? openreview(exame.uuid) : openfreeReview(exame.uuid)"
                   color="secondary" variant="flat" :disabled="!exame.available">
                   <v-icon left>mdi-calendar</v-icon>
-                  {{ userProfile.ativo == 0 && exame.id > 2 ? "Conteúdo Premium" : "Fazer exame" }} </v-btn>
-                <v-btn
-                  @click="userProfile.ativo == 0 && exame.id > 2 ? openreview(exame.uuid) : openfreeReview(exame.uuid)"
-                  color="secondary" variant="flat" :disabled="!exame.available">
-                  <v-icon left>mdi-calendar</v-icon>
-                  {{ userProfile.ativo == 0 && exame.id > 2 ? "Conteúdo Premium" : "ver resumo" }} </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-window-item>
-      <v-window-item :value="2">
-        
-
-        <v-row>
-          <v-col cols="12" md="6" v-for="exame in exameList2" :key="exame.id">
-            <v-card class="pa-4" hover>
-              <v-card-item>
-                <v-card-title class="text-h6">
-                  Exame #{{ exame.id }}
-                </v-card-title>
-                <v-card-subtitle>
-                  <v-chip :color="exame.available ? 'green' : 'red'" size="small" class="mr-2">
-                    {{ exame.available ? 'Disponível' : 'Indisponível' }}
-                  </v-chip>
-                </v-card-subtitle>
-              </v-card-item>
-
-              <v-card-actions>
-                <v-btn color="primary" variant="outlined" :disabled="!exame.available" @click="openDialog(exame)">
-                  <v-icon left>mdi-information</v-icon>
-                  Detalhes
-                </v-btn>
-                <v-btn
-                  @click="userProfile.ativo == 0 && exame.id > 2 ? openexame2(exame.uuid) : openfreeExams2(exame.uuid)"
-                  color="secondary" variant="flat" :disabled="!exame.available">
-                  <v-icon left>mdi-calendar</v-icon>
-                  {{ userProfile.ativo == 0 && exame.id > 2 ? "Conteúdo Premium" : "Fazer exame" }} </v-btn>
-                <v-btn
-                  @click="userProfile.ativo == 0 && exame.id > 2 ? openreview2(exame.uuid) : openfreeReview2(exame.uuid)"
-                  color="secondary" variant="flat" :disabled="!exame.available">
-                  <v-icon left>mdi-calendar</v-icon>
-                  {{ userProfile.ativo == 0 && exame.id > 2 ? "Conteúdo Premium" : "ver resumo" }} </v-btn>
+                  {{ userProfile.ativo == 0 && exame.id > 1 ? "Conteúdo Premium" : "ver resumo" }} </v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -357,9 +310,9 @@ export default defineComponent({
         montante: 168
       } as { tempo: string, montante: number },
       price: [
-      { "tempo": "semanal", "montante": 100 },
-      { "tempo": "mensal", "montante": 210 },
-      { "tempo": "semestral", "montante": 330 }
+      { "tempo": "semanal", "montante": 150 },
+      { "tempo": "mensal", "montante": 250 },
+      { "tempo": "semestral", "montante": 350 }
       ],
       userProfile: {} as {
         id: number,
@@ -375,10 +328,10 @@ export default defineComponent({
       },
 
       examUuid: "",
-      exameList: [] as { id: number; available: number; uuid: string }[],
+      exameList: [] as { id: number; available: number; uuid: string, novo:number }[],
       questionsList: [] as { id: number, correctAnswer: string, question: string }[],
-      exameList2: [] as { id: number; available: number; uuid: string }[],
-      questionsList2: [] as { id: number, correctAnswer: string, question: string }[],
+    //  exameList2: [] as { id: number; available: number; uuid: string }[],
+     // questionsList2: [] as { id: number, correctAnswer: string, question: string }[],
       dialog: false, // Controla a visibilidade do dialog
       dialog2: false, // Controla a visibilidade do dialog
       phoneNumber: "",
@@ -399,7 +352,6 @@ export default defineComponent({
   mounted() {
     this.getUserProfile()
     this.getallExames();
-    this.getallExamesOlds();
 
   },
   methods: {
@@ -488,19 +440,12 @@ export default defineComponent({
     async getallExames() {
       try {
         const response = await apiService.get(`${baseurl}/`);
-        this.exameList = response as { id: number; available: number; uuid: string }[];
+        this.exameList = response as { id: number; available: number; uuid: string, novo: number }[];
       } catch (error) {
         console.error('Erro ao carregar exames:', error);
       }
     },
-    async getallExamesOlds() {
-      try {
-        const response = await apiService.get(`${baseurl}/a/`);
-        this.exameList2 = response as { id: number; available: number; uuid: string }[];
-      } catch (error) {
-        console.error('Erro ao carregar exames:', error);
-      }
-    },
+    
     async getallSumary() {
       try {
         const response = await apiService.get(`${baseurl}/user2/${this.userProfile.pags}`);

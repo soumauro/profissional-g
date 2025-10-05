@@ -43,6 +43,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/promocoes',
+    name: 'PromocoesPage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/promotion.vue'),
+    props:true,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/exames2/:uuid',
     name: 'exameuser2',
     component: () => import(/* webpackChunkName: "about" */ '../views/makeexame2.vue'),
